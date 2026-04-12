@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI Tools — SkillSwap Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script defer src="script.js"></script>
+</head>
+
+<style>
+  body {
+    background-image: url('back_ground.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+  }
+</style>
+
+<body>
+
+  <!-- Login protection -->
+  <script>
+    if (!localStorage.getItem('skillhub_currentUser')) {
+      window.location.href = 'login.html';
+    }
+  </script>
+
+  <header>
+    <div class="logo">SkillSwap Hub</div>
+
+    <nav>
+      <a href="index.html" class="pill">Home</a>
+      <a href="resource.html" class="pill">Resources</a>
+      <a href="ai.html" class="pill">AI Tools</a>
+      <a href="about.html" class="pill">About</a>
+      <a href="contact.html" class="pill">Contact</a>
+      <button id="logoutBtn" class="btn alt">Logout</button>
+    </nav>
+  </header>
+
+  <main style="max-width:900px;margin:auto;padding:20px">
+    <div class="card">
+      <h2>AI Tools for Learning & Creativity</h2>
+      <p class="muted">
+        These AI tools help with writing, coding, image generation, 3D creation, and more.
+        All information is stored locally using <strong>localStorage</strong>.
+      </p>
+
+      <h3 style="margin-top:20px">Available AI Tools</h3>
+
+      <h4>Luma Labs - 3D Model generation</h4>
+      <h4>Chatgpt - Writing, Brainstorming</h4>
+      <h4>Copilot - Summarisation</h4>
+      <h4>Figma - Design ideas</h4>
+
+      
+    </div>
+  </main>
+
+  <footer>
+    SkillSwap Hub — Prototype for COM4113
+  </footer>
+
+  <!-- Modal Root -->
+  <div id="modalRoot" class="hidden"></div>
+
+</body>
+
+</html>

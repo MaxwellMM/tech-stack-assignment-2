@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile — SkillSwap Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<style>
+  body {
+    background-image: url('back_ground.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+  }
+</style>
+
+<body>
+
+  <main style="max-width:520px;margin:60px auto;padding:20px">
+    <div class="card">
+
+      <h2>Edit Your Profile</h2>
+
+      <form id="profileForm">
+
+        <label>
+          Full Name *<br>
+          <input type="text" id="fullName" required />
+        </label>
+
+        <label style="margin-top:12px">
+          Email *<br>
+          <input type="email" id="email" disabled />
+        </label>
+
+        <label style="margin-top:12px">
+          Hobbies (Use comma to seperate)<br>
+          <input type="text" id="skills" placeholder="Baking, Art, Coding" />
+        </label>
+
+        <label style="margin-top:12px">
+          Profile Photo<br>
+          <input type="file" id="photoFile" accept="image/*" />
+        </label>
+
+        <div style="margin-top:10px">
+          <img id="photoPreview" alt="Profile preview"
+            style="max-width:120px;border-radius:8px;display:none" />
+        </div>
+
+        <button class="btn" type="submit" style="margin-top:15px;">
+          Save Profile
+        </button>
+
+      </form>
+
+      <div id="profileFeedback" class="muted" style="margin-top:10px;"></div>
+
+    </div>
+  </main>
+
+  <script>
+    const currentUser = JSON.parse(localStorage.getItem('skillhub_currentUser'));
+
+    // Protect page
+    if (!currentUser) {
+      window.location.href = 'login.html';
+    }
+
+    const form = document.getElementById('profileForm');
+    const feedback = document.getElementById('profileFeedback');
+
+    const fullNameInput = document.getElementById('fullName');
+    const emailInput = document.getElementById('email');
+    const skillsInput = document.getElementById('skills');
+    const photoFileInput = document.getElementById('photoFile');
+    const photoPreview = document.getElementById('photoPreview');
+
+    // Pre-fill form
+    fullNameInput.value = currentUser.fullName || '';
+    emailInput.value = currentUser.email || '';
+    skillsInput.value = (currentUser.skills || []).join(', ');
+
+    if (currentUser.photo) {
+      photoPreview.src = currentUser.photo;
+      photoPreview.style.display = 'block';
+    }
+
+    // Handle image upload
+    photoFileInput.addEventListener('change', () => {
+      const file = photoFileInput.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        photoPreview.src = reader.result;
+        photoPreview.style.display = 'block';
+        currentUser.photo = reader.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Save profile
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      let state = JSON.parse(localStorage.getItem('skillhub_state') || '{}');
+      state.users = state.users || [];
+
+      const updatedSkills = skillsInput.value
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
+
+      const updatedUser = {
+        ...currentUser,
+        fullName: fullNameInput.value.trim(),
+        skills: updatedSkills,
+        photo: currentUser.photo || ''
+      };
+
+      const index = state.users.findIndex(u => u.email === currentUser.email);
+      state.users[index] = updatedUser;
+
+      localStorage.setItem('skillhub_state', JSON.stringify(state));
+      localStorage.setItem('skillhub_currentUser', JSON.stringify(updatedUser));
+
+      feedback.textContent = 'Profile saved successfully.';
+
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1000);
+    });
+  </script>
+
+</body>
+</html>

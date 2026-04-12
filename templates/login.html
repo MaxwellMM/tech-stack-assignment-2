@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login — SkillSwap Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<style>
+  body {
+    background-image: url('back_ground.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+  }
+
+  .toggle {
+    margin-top: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    color: #0077cc;
+    text-decoration: underline;
+  }
+</style>
+
+<body>
+
+  <main style="max-width:420px;margin:60px auto;padding:20px">
+    <div class="card">
+
+      <h2 id="formTitle">Login to SkillSwap Hub</h2>
+
+      <form id="loginForm">
+
+        <label>
+          Email *<br>
+          <input type="email" id="email" required />
+        </label>
+
+        <label id="nameField" style="margin-top:12px; display:none;">
+          Full Name *<br>
+          <input type="text" id="fullName" />
+        </label>
+
+        <label style="margin-top:12px">
+          Password *<br>
+          <input type="password" id="password" required />
+        </label>
+
+        <button class="btn" type="submit" style="margin-top:15px;">
+          Login
+        </button>
+
+      </form>
+
+      <div id="toggleMode" class="toggle">
+        Don’t have an account? Sign up
+      </div>
+
+      <div id="loginFeedback" class="muted" style="margin-top:10px;"></div>
+
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const feedback = document.getElementById('loginFeedback');
+    const toggle = document.getElementById('toggleMode');
+    const title = document.getElementById('formTitle');
+    const nameField = document.getElementById('nameField');
+    const submitBtn = form.querySelector('button');
+
+    let isSignup = false;
+
+    // Toggle between Login and Sign Up
+    toggle.addEventListener('click', () => {
+      isSignup = !isSignup;
+
+      title.textContent = isSignup ? "Sign Up to SkillSwap Hub" : "Login to SkillSwap Hub";
+      submitBtn.textContent = isSignup ? "Sign Up" : "Login";
+      toggle.textContent = isSignup
+        ? "Already have an account? Login"
+        : "Don’t have an account? Sign up";
+
+      nameField.style.display = isSignup ? "block" : "none";
+      feedback.textContent = "";
+    });
+
+    // Handle form submission
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const emailInput = document.getElementById('email').value.trim();
+      const passwordInput = document.getElementById('password').value.trim();
+      const fullNameInput = document.getElementById('fullName')?.value.trim();
+
+      if (!emailInput || !passwordInput) {
+        feedback.textContent = "Please fill in all required fields.";
+        return;
+      }
+
+      let state = JSON.parse(localStorage.getItem('skillhub_state') || "{}");
+      state.users = state.users || [];
+
+      const existingUser = state.users.find(u => u.email === emailInput);
+
+      if (isSignup) {
+        if (!fullNameInput) {
+          feedback.textContent = "Full name is required to sign up.";
+          return;
+        }
+
+        if (existingUser) {
+          feedback.textContent = "An account with this email already exists.";
+          return;
+        }
+
+        const newUser = {
+          fullName: fullNameInput,
+          email: emailInput,
+          password: passwordInput,
+          skills: [],
+          photo: ""
+        };
+
+        state.users.push(newUser);
+        localStorage.setItem('skillhub_state', JSON.stringify(state));
+        localStorage.setItem('skillhub_currentUser', JSON.stringify(newUser));
+
+        // Redirect after Sign Up
+        window.location.href = "index.html";
+
+      } else {
+        if (!existingUser || existingUser.password !== passwordInput) {
+          feedback.textContent = "Invalid email or password.";
+          return;
+        }
+
+        localStorage.setItem('skillhub_currentUser', JSON.stringify(existingUser));
+
+        // Redirect after Login
+        window.location.href = "index.html";
+      }
+    });
+  </script>
+
+</body>
+</html>

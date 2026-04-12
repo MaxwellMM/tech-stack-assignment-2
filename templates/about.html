@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>About — SkillSwap Hub</title>
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<style>
+    body {
+        background-image: url('back_ground.png');
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-size: cover;
+    }
+</style>
+
+<body>
+
+    <!-- LOGIN PROTECTION -->
+    <script>
+        if (!localStorage.getItem('skillhub_currentUser')) {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <header>
+        <div class="logo">SkillSwap Hub</div>
+
+        <nav>
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="resource.html" class="nav-link">Resources</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+            <a href="ai.html" class="nav-link">AI Tools</a>
+            <a href="login.html" class="nav-link">Logout</a>
+        </nav>
+    </header>
+
+    <main style="max-width:900px;margin:auto;padding:20px">
+        <div class="card">
+            <h2>About SkillSwap Hub</h2>
+
+            <p>
+                SkillSwap Hub is a community driven platform where learners,
+                hobbyists, and creators can exchange skills, share learning
+                resources, and support each other's growth.
+            </p>
+
+            <h3>Our Mission</h3>
+            <p>
+                To empower individuals of all backgrounds to learn, teach, and grow
+                through a collaborative skills sharing community. Learning will be
+                accessible, supportive, and fun and SkillSwap Hub will make that possible.
+            </p>
+
+            <h3>What You Can Do</h3>
+            <ul>
+                <li>Share your own learning resources</li>
+                <li>Browse community posts by category</li>
+                <li>Search, filter, and sort resources</li>
+                <li>Upload images with your posts</li>
+                <li>Comment on posts and join discussions</li>
+                <li>Create and update your personal profile</li>
+                <li>Request new skills from the community</li>
+            </ul>
+
+            <h3>Technology Used</h3>
+            <ul>
+                <li>HTML5, CSS3, JavaScript</li>
+                <li>LocalStorage for saving posts, profiles, and comments</li>
+                <li>Client-side dynamic rendering (no server needed)</li>
+                <li>Responsive layout for mobiles, tablets, and desktops</li>
+            </ul>
+            
+            </p>
+        </div>
+    </main>
+
+    <footer>
+        COM4113 — SkillSwap Hub
+    </footer>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>

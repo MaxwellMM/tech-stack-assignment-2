@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Resources — SkillSwap Hub</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+
+<style>
+  body {
+    background-image: url('back_ground.png');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+  }
+</style>
+
+<body>
+
+  <!-- LOGIN PROTECTION -->
+  <script>
+    if (!localStorage.getItem('skillhub_currentUser')) {
+      window.location.href = "login.html";
+    }
+  </script>
+
+  <header>
+    <div class="logo">SkillSwap Hub</div>
+    <nav>
+      <a href="index.html" class="pill">Home</a>
+      <a href="resource.html" class="pill">Resources</a>
+      <a href="about.html" class="pill">About</a>
+      <a href="contact.html" class="pill">Contact</a>
+      <a href="ai.html" class="pill">AI Tools</a>
+      <a href="login.html" class="pill">Logout</a>
+    </nav>
+  </header>
+
+  <main style="max-width:1100px;margin:auto;padding:20px">
+
+    <div class="card">
+      <h2>Community Resources</h2>
+      <p class="muted">Browse, upload, and explore shared community knowledge.</p>
+
+      <!-- SEARCH -->
+      <div class="search-row" style="margin-top:12px">
+        <input id="searchInput" type="text" placeholder="Search resources..." />
+        <button id="searchBtn" class="btn">Search</button>
+        <button id="clearSearch" class="btn alt">Clear</button>
+      </div>
+
+      <!-- FILTER / SORT -->
+      <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
+
+        <label class="muted">Category:</label>
+        <select id="categoryFilter">
+          <option value="all">All categories</option>
+        </select>
+
+        <label class="muted" style="margin-left:15px">Sort:</label>
+        <select id="sortSelect">
+          <option value="new">Newest</option>
+          <option value="top">Top Upvoted</option>
+        </select>
+
+        <button id="openPost" class="btn alt" style="margin-left:auto">
+          Share a Resource
+        </button>
+
+      </div>
+
+      <!-- RESULTS -->
+      <div id="results" class="tools-list" style="margin-top:18px;"></div>
+    </div>
+
+    <!-- MODAL ROOT -->
+    <div id="modalRoot" class="hidden"></div>
+
+  </main>
+
+  <footer>
+    SkillSwap Hub — COM4113 Project
+  </footer>
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
