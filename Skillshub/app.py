@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, jsonify
 from pymongo import MongoClient
 from flask_bcrypt import Bcrypt
 from bson.objectid import ObjectId
@@ -12,12 +12,18 @@ db = client["skillswap"]
 
 bcrypt = Bcrypt(app)
 
-# ---------------- HOME / SEARCH ----------------
+# ---------------- HOME ----------------
 @app.route("/")
 def home():
     if "user" not in session:
         return redirect("/login")
 
+    return render_template("index.html")
+
+
+# ---------------- API (FOR JS) ----------------
+@app.route("/api/resources")
+def api_resources():
     search = request.args.get("search")
 
     if search:
@@ -30,7 +36,13 @@ def home():
     else:
         resources = db.resources.find()
 
-    return render_template("index.html", resources=resources)
+    result = []
+    for r in resources:
+        r["_id"] = str(r["_id"])
+        result.append(r)
+
+    return jsonify(result)
+
 
 # ---------------- AUTH ----------------
 @app.route("/login", methods=["GET", "POST"])
@@ -58,7 +70,6 @@ def register():
     if not email or not password:
         return "Missing fields"
 
-    # Check if user exists
     if db.users.find_one({"email": email}):
         return "User already exists"
 
@@ -81,6 +92,7 @@ def logout():
     session.clear()
     return redirect("/login")
 
+
 # ---------------- PROFILE ----------------
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
@@ -88,33 +100,30 @@ def profile():
         return redirect("/login")
 
     if request.method == "POST":
-        name = request.form.get("name")
-        bio = request.form.get("bio")
-
         db.users.update_one(
             {"email": session["user"]},
             {"$set": {
-                "name": name,
-                "bio": bio
+                "name": request.form.get("name"),
+                "bio": request.form.get("bio")
             }}
         )
 
     user = db.users.find_one({"email": session["user"]})
     return render_template("profile.html", user=user)
 
+
 # ---------------- ADD RESOURCE ----------------
 @app.route("/add", methods=["POST"])
 def add_resource():
     if "user" not in session:
-        return redirect("/login")
+        return jsonify({"error": "Not logged in"}), 401
 
     title = request.form.get("title")
     description = request.form.get("description")
     category = request.form.get("category")
 
-    # Validation
     if not title or not description:
-        return "Title and description required"
+        return jsonify({"error": "Missing fields"}), 400
 
     db.resources.insert_one({
         "title": title,
@@ -125,40 +134,41 @@ def add_resource():
         "createdBy": session["user"]
     })
 
-    return redirect("/")
+    return jsonify({"message": "Resource added"})
+
 
 # ---------------- UPVOTE ----------------
 @app.route("/upvote/<id>")
 def upvote(id):
-    if "user" not in session:
-        return redirect("/login")
+    try:
+        db.resources.update_one(
+            {"_id": ObjectId(id)},
+            {"$inc": {"upvotes": 1}}
+        )
+        return jsonify({"message": "Upvoted"})
+    except:
+        return jsonify({"error": "Invalid ID"}), 400
 
-    db.resources.update_one(
-        {"_id": ObjectId(id)},
-        {"$inc": {"upvotes": 1}}
-    )
-
-    return redirect("/")
 
 # ---------------- COMMENT ----------------
 @app.route("/comment/<id>", methods=["POST"])
 def comment(id):
-    if "user" not in session:
-        return redirect("/login")
-
     text = request.form.get("comment")
 
     if not text:
-        return redirect("/")
+        return jsonify({"error": "Empty comment"}), 400
 
-    db.resources.update_one(
-        {"_id": ObjectId(id)},
-        {"$push": {"comments": text}}
-    )
+    try:
+        db.resources.update_one(
+            {"_id": ObjectId(id)},
+            {"$push": {"comments": text}}
+        )
+        return jsonify({"message": "Comment added"})
+    except:
+        return jsonify({"error": "Invalid ID"}), 400
 
-    return redirect("/")
 
-# ---------------- BOOKMARK (POST-MVP) ----------------
+# ---------------- BOOKMARK ----------------
 @app.route("/bookmark/<id>")
 def bookmark(id):
     if "user" not in session:
@@ -166,12 +176,13 @@ def bookmark(id):
 
     db.users.update_one(
         {"email": session["user"]},
-        {"$addToSet": {"bookmarks": id}}  # avoids duplicates
+        {"$addToSet": {"bookmarks": id}}
     )
 
     return redirect("/")
 
-# ---------------- ERROR HANDLING ----------------
+
+# ---------------- ERRORS ----------------
 @app.errorhandler(404)
 def not_found(e):
     return "404 - Page Not Found", 404
@@ -181,6 +192,7 @@ def not_found(e):
 def server_error(e):
     return "500 - Internal Server Error", 500
 
-# ---------------- RUN APP ----------------
+
+# ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)
