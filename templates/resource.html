@@ -5,39 +5,34 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Resources — SkillSwap Hub</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
 
-<style>
-  body {
-    background-image: url('back_ground.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
-  }
-</style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='back_ground.png') }}");
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+  </style>
+</head>
 
 <body>
 
-  <!-- LOGIN PROTECTION -->
-  <script>
-    if (!localStorage.getItem('skillhub_currentUser')) {
-      window.location.href = "login.html";
-    }
-  </script>
-
+  <!-- HEADER -->
   <header>
     <div class="logo">SkillSwap Hub</div>
     <nav>
-      <a href="index.html" class="pill">Home</a>
-      <a href="resource.html" class="pill">Resources</a>
-      <a href="about.html" class="pill">About</a>
-      <a href="contact.html" class="pill">Contact</a>
-      <a href="ai.html" class="pill">AI Tools</a>
-      <a href="login.html" class="pill">Logout</a>
+      <a href="/" class="pill">Home</a>
+      <a href="/" class="pill">Resources</a>
+      <a href="/profile" class="pill">Profile</a>
+      <a href="/logout" class="pill">Logout</a>
     </nav>
   </header>
 
+  <!-- MAIN -->
   <main style="max-width:1100px;margin:auto;padding:20px">
 
     <div class="card">
@@ -71,26 +66,31 @@
 
       </div>
 
+      <!-- POST FORM (USED BY JS) -->
+      <form id="postForm" style="margin-top:15px;">
+        <input id="postTitle" placeholder="Title" required>
+        <input id="postDesc" placeholder="Description" required>
+        <input id="postCategory" placeholder="Category">
+        <button type="submit" class="btn">Add Resource</button>
+      </form>
+
       <!-- RESULTS -->
       <div id="results" class="tools-list" style="margin-top:18px;"></div>
+
     </div>
 
     <!-- MODAL ROOT -->
     <div id="modalRoot" class="hidden"></div>
 
-    <form method="POST" action="/add">
-    <input name="title" placeholder="Title">
-    <input name="description" placeholder="Description">
-    <button>Add</button>
-</form>
-
   </main>
 
+  <!-- FOOTER -->
   <footer>
     SkillSwap Hub — COM4113 Project
   </footer>
 
-  <script src="script.js"></script>
+  <!-- JS -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 
