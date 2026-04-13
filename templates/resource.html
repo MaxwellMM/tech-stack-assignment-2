@@ -74,6 +74,11 @@
         <button type="submit" class="btn">Add Resource</button>
       </form>
 
+      <form method="POST" action="/comment/{{ r._id }}">
+        <input name="comment">
+        <button>Send</button>
+      </form>
+
       <!-- RESULTS -->
       <div id="results" class="tools-list" style="margin-top:18px;"></div>
 
