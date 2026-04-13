@@ -6,35 +6,59 @@ from bson.objectid import ObjectId
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
-# ---------------- DATABASE ----------------
+# DATABASE
 client = MongoClient("mongodb://localhost:27017/")
 db = client["skillswap"]
 
 bcrypt = Bcrypt(app)
 
-# ---------------- HOME ----------------
+# ---------------- ROUTES ----------------
+
 @app.route("/")
 def home():
     if "user" not in session:
         return redirect("/login")
-
     return render_template("index.html")
 
 
-# ---------------- API (FOR JS) ----------------
+@app.route("/resources")
+def resources():
+    if "user" not in session:
+        return redirect("/login")
+    return render_template("resource.html")
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html")
+
+
+@app.route("/ai")
+def ai():
+    return render_template("ai.html")
+
+
+# ---------------- API ----------------
+
 @app.route("/api/resources")
 def api_resources():
     search = request.args.get("search")
 
+    query = {}
     if search:
-        resources = db.resources.find({
+        query = {
             "$or": [
                 {"title": {"$regex": search, "$options": "i"}},
                 {"description": {"$regex": search, "$options": "i"}}
             ]
-        })
-    else:
-        resources = db.resources.find()
+        }
+
+    resources = db.resources.find(query)
 
     result = []
     for r in resources:
@@ -45,6 +69,7 @@ def api_resources():
 
 
 # ---------------- AUTH ----------------
+
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if request.method == "POST":
@@ -56,8 +81,7 @@ def login():
         if user and bcrypt.check_password_hash(user["password"], password):
             session["user"] = email
             return redirect("/")
-        else:
-            return "Invalid email or password"
+        return "Invalid login"
 
     return render_template("login.html")
 
@@ -67,11 +91,8 @@ def register():
     email = request.form.get("email")
     password = request.form.get("password")
 
-    if not email or not password:
-        return "Missing fields"
-
     if db.users.find_one({"email": email}):
-        return "User already exists"
+        return "User exists"
 
     hashed_pw = bcrypt.generate_password_hash(password).decode("utf-8")
 
@@ -80,8 +101,7 @@ def register():
         "password": hashed_pw,
         "name": "",
         "bio": "",
-        "hobbies": [],
-        "bookmarks": []
+        "skills": []
     })
 
     return redirect("/login")
@@ -94,6 +114,7 @@ def logout():
 
 
 # ---------------- PROFILE ----------------
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile():
     if "user" not in session:
@@ -112,85 +133,44 @@ def profile():
     return render_template("profile.html", user=user)
 
 
-# ---------------- ADD RESOURCE ----------------
+# ---------------- RESOURCE ACTIONS ----------------
+
 @app.route("/add", methods=["POST"])
 def add_resource():
     if "user" not in session:
         return jsonify({"error": "Not logged in"}), 401
 
-    title = request.form.get("title")
-    description = request.form.get("description")
-    category = request.form.get("category")
-
-    if not title or not description:
-        return jsonify({"error": "Missing fields"}), 400
-
     db.resources.insert_one({
-        "title": title,
-        "description": description,
-        "category": category,
+        "title": request.form.get("title"),
+        "description": request.form.get("description"),
+        "category": request.form.get("category"),
         "upvotes": 0,
         "comments": [],
         "createdBy": session["user"]
     })
 
-    return jsonify({"message": "Resource added"})
+    return jsonify({"message": "Added"})
 
 
-# ---------------- UPVOTE ----------------
 @app.route("/upvote/<id>")
 def upvote(id):
-    try:
-        db.resources.update_one(
-            {"_id": ObjectId(id)},
-            {"$inc": {"upvotes": 1}}
-        )
-        return jsonify({"message": "Upvoted"})
-    except:
-        return jsonify({"error": "Invalid ID"}), 400
+    db.resources.update_one(
+        {"_id": ObjectId(id)},
+        {"$inc": {"upvotes": 1}}
+    )
+    return jsonify({"message": "Upvoted"})
 
 
-# ---------------- COMMENT ----------------
 @app.route("/comment/<id>", methods=["POST"])
 def comment(id):
     text = request.form.get("comment")
 
-    if not text:
-        return jsonify({"error": "Empty comment"}), 400
-
-    try:
-        db.resources.update_one(
-            {"_id": ObjectId(id)},
-            {"$push": {"comments": text}}
-        )
-        return jsonify({"message": "Comment added"})
-    except:
-        return jsonify({"error": "Invalid ID"}), 400
-
-
-# ---------------- BOOKMARK ----------------
-@app.route("/bookmark/<id>")
-def bookmark(id):
-    if "user" not in session:
-        return redirect("/login")
-
-    db.users.update_one(
-        {"email": session["user"]},
-        {"$addToSet": {"bookmarks": id}}
+    db.resources.update_one(
+        {"_id": ObjectId(id)},
+        {"$push": {"comments": text}}
     )
 
-    return redirect("/")
-
-
-# ---------------- ERRORS ----------------
-@app.errorhandler(404)
-def not_found(e):
-    return "404 - Page Not Found", 404
-
-
-@app.errorhandler(500)
-def server_error(e):
-    return "500 - Internal Server Error", 500
+    return jsonify({"message": "Comment added"})
 
 
 # ---------------- RUN ----------------
