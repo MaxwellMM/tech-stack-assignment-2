@@ -5,25 +5,27 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Login — SkillSwap Hub</title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='back_ground.png') }}");
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+
+    .toggle {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      color: #0077cc;
+      text-decoration: underline;
+    }
+  </style>
 </head>
-
-<style>
-  body {
-    background-image: url('back_ground.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
-  }
-
-  .toggle {
-    margin-top: 10px;
-    font-size: 0.9rem;
-    cursor: pointer;
-    color: #0077cc;
-    text-decoration: underline;
-  }
-</style>
 
 <body>
 
@@ -32,101 +34,59 @@
 
       <h2 id="formTitle">Login to SkillSwap Hub</h2>
 
-      <form method="POST">
-        <input name="email">
-        <input name="password">
-        <button>Login</button>
+      <!-- LOGIN FORM -->
+      <form id="loginForm" method="POST" action="/login">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+
+        <button class="btn" type="submit">Login</button>
       </form>
 
+      <!-- REGISTER FORM -->
+      <form id="registerForm" method="POST" action="/register" style="display:none;">
+        <input name="email" type="email" placeholder="Email" required>
+        <input name="password" type="password" placeholder="Password" required>
+
+        <button class="btn" type="submit">Sign Up</button>
       </form>
 
+      <!-- TOGGLE -->
       <div id="toggleMode" class="toggle">
         Don’t have an account? Sign up
       </div>
 
-      <div id="loginFeedback" class="muted" style="margin-top:10px;"></div>
+      <!-- FEEDBACK -->
+      {% if error %}
+        <div class="muted" style="margin-top:10px;color:red;">
+          {{ error }}
+        </div>
+      {% endif %}
 
     </div>
   </main>
 
+  <!-- SCRIPT -->
   <script>
-    const form = document.getElementById('loginForm');
-    const feedback = document.getElementById('loginFeedback');
     const toggle = document.getElementById('toggleMode');
+    const loginForm = document.getElementById('loginForm');
+    const registerForm = document.getElementById('registerForm');
     const title = document.getElementById('formTitle');
-    const nameField = document.getElementById('nameField');
-    const submitBtn = form.querySelector('button');
 
     let isSignup = false;
 
-    // Toggle between Login and Sign Up
     toggle.addEventListener('click', () => {
       isSignup = !isSignup;
 
-      title.textContent = isSignup ? "Sign Up to SkillSwap Hub" : "Login to SkillSwap Hub";
-      submitBtn.textContent = isSignup ? "Sign Up" : "Login";
-      toggle.textContent = isSignup
-        ? "Already have an account? Login"
-        : "Don’t have an account? Sign up";
-
-      nameField.style.display = isSignup ? "block" : "none";
-      feedback.textContent = "";
-    });
-
-    // Handle form submission
-    form.addEventListener('submit', e => {
-      e.preventDefault();
-
-      const emailInput = document.getElementById('email').value.trim();
-      const passwordInput = document.getElementById('password').value.trim();
-      const fullNameInput = document.getElementById('fullName')?.value.trim();
-
-      if (!emailInput || !passwordInput) {
-        feedback.textContent = "Please fill in all required fields.";
-        return;
-      }
-
-      let state = JSON.parse(localStorage.getItem('skillhub_state') || "{}");
-      state.users = state.users || [];
-
-      const existingUser = state.users.find(u => u.email === emailInput);
-
       if (isSignup) {
-        if (!fullNameInput) {
-          feedback.textContent = "Full name is required to sign up.";
-          return;
-        }
-
-        if (existingUser) {
-          feedback.textContent = "An account with this email already exists.";
-          return;
-        }
-
-        const newUser = {
-          fullName: fullNameInput,
-          email: emailInput,
-          password: passwordInput,
-          skills: [],
-          photo: ""
-        };
-
-        state.users.push(newUser);
-        localStorage.setItem('skillhub_state', JSON.stringify(state));
-        localStorage.setItem('skillhub_currentUser', JSON.stringify(newUser));
-
-        // Redirect after Sign Up
-        window.location.href = "index.html";
-
+        loginForm.style.display = "none";
+        registerForm.style.display = "block";
+        title.textContent = "Sign Up to SkillSwap Hub";
+        toggle.textContent = "Already have an account? Login";
       } else {
-        if (!existingUser || existingUser.password !== passwordInput) {
-          feedback.textContent = "Invalid email or password.";
-          return;
-        }
-
-        localStorage.setItem('skillhub_currentUser', JSON.stringify(existingUser));
-
-        // Redirect after Login
-        window.location.href = "index.html";
+        loginForm.style.display = "block";
+        registerForm.style.display = "none";
+        title.textContent = "Login to SkillSwap Hub";
+        toggle.textContent = "Don’t have an account? Sign up";
       }
     });
   </script>
