@@ -1,19 +1,13 @@
-/* --------------------------------------
-   GLOBAL STATE
--------------------------------------- */
-let allPosts = [];
-
-
-/* --------------------------------------
-   LOAD POSTS FROM FLASK API
--------------------------------------- */
+// --------------------------------------
+// LOAD POSTS FROM BACKEND
+// --------------------------------------
 async function loadPosts() {
     try {
         const res = await fetch("/api/resources");
-        const data = await res.json();
+        const posts = await res.json();
 
-        allPosts = data;
-        renderPosts(allPosts);
+        populateCategories(posts);
+        renderPosts(posts);
 
     } catch (err) {
         console.error("Error loading posts:", err);
@@ -21,26 +15,40 @@ async function loadPosts() {
 }
 
 
-/* --------------------------------------
-   RENDER POSTS
--------------------------------------- */
+// --------------------------------------
+// RENDER POSTS (MODERN UI)
+// --------------------------------------
 function renderPosts(posts) {
-    const container = document.getElementById("results");
-    if (!container) return;
+    const resultsEl = document.getElementById("results");
+    if (!resultsEl) return;
 
+    const sort = document.getElementById("sortSelect")?.value || "new";
+    const category = document.getElementById("categoryFilter")?.value || "all";
+
+    // FILTER
+    if (category !== "all") {
+        posts = posts.filter(p =>
+            (p.category || "").toLowerCase() === category.toLowerCase()
+        );
+    }
+
+    // SORT
+    if (sort === "top") {
+        posts.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+    } else {
+        posts.reverse(); // newest
+    }
+
+    // EMPTY STATE
     if (posts.length === 0) {
-        container.innerHTML = "<p class='muted'>No resources found.</p>";
+        resultsEl.innerHTML = "<p class='muted'>No resources found.</p>";
         return;
     }
 
-    container.innerHTML = posts.map(p => `
-        <div class="card tool" data-id="${p._id}">
+    // RENDER
+    resultsEl.innerHTML = posts.map(p => `
+        <div class="card fade-in">
             <h3>${escapeHtml(p.title)}</h3>
-
-            <p class="muted">
-                ${new Date(p.createdAt || Date.now()).toLocaleString()}
-            </p>
-
             <p>${escapeHtml(p.description)}</p>
 
             <div class="tags">
@@ -48,47 +56,42 @@ function renderPosts(posts) {
             </div>
 
             <div class="post-actions">
-                <button class="btn alt" onclick="upvote('${p._id}')">
-                    ▲ ${p.upvotes || 0}
+                <button class="btn" onclick="upvote('${p._id}')">
+                    👍 ${p.upvotes || 0}
                 </button>
             </div>
 
-            <div style="margin-top:10px">
-                <strong>Comments:</strong>
+            <form onsubmit="addComment(event, '${p._id}')">
+                <input name="comment" placeholder="Add comment..." required>
+            </form>
 
-                <ul>
-                    ${(p.comments || [])
-                        .map(c => `<li>${escapeHtml(c)}</li>`)
-                        .join("")}
-                </ul>
-
-                <form onsubmit="addComment(event, '${p._id}')">
-                    <input name="comment" placeholder="Write a comment..." required>
-                    <button class="btn">Post</button>
-                </form>
-            </div>
+            <ul>
+                ${(p.comments || [])
+                    .map(c => `<li>${escapeHtml(c)}</li>`)
+                    .join("")}
+            </ul>
         </div>
     `).join("");
 }
 
 
-/* --------------------------------------
-   CREATE POST
--------------------------------------- */
-async function createPost(e) {
-    e.preventDefault();
+// --------------------------------------
+// CREATE POST
+// --------------------------------------
+async function createPost(event) {
+    event.preventDefault();
 
     const title = document.getElementById("postTitle").value.trim();
     const description = document.getElementById("postDesc").value.trim();
     const category = document.getElementById("postCategory").value.trim();
 
     if (!title || !description) {
-        alert("Please fill all required fields");
+        showToast("Please fill in all required fields");
         return;
     }
 
     try {
-        const res = await fetch("/add", {
+        await fetch("/add", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
@@ -96,14 +99,9 @@ async function createPost(e) {
             body: `title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&category=${encodeURIComponent(category)}`
         });
 
-        const data = await res.json();
-
-        if (data.error) {
-            alert(data.error);
-            return;
-        }
-
         document.getElementById("postForm").reset();
+        showToast("Resource added successfully ✅");
+
         loadPosts();
 
     } catch (err) {
@@ -112,27 +110,26 @@ async function createPost(e) {
 }
 
 
-/* --------------------------------------
-   UPVOTE
--------------------------------------- */
+// --------------------------------------
+// UPVOTE
+// --------------------------------------
 async function upvote(id) {
     try {
         await fetch(`/upvote/${id}`);
         loadPosts();
     } catch (err) {
-        console.error("Upvote error:", err);
+        console.error("Error upvoting:", err);
     }
 }
 
 
-/* --------------------------------------
-   ADD COMMENT
--------------------------------------- */
-async function addComment(e, id) {
-    e.preventDefault();
+// --------------------------------------
+// ADD COMMENT
+// --------------------------------------
+async function addComment(event, id) {
+    event.preventDefault();
 
-    const comment = e.target.comment.value.trim();
-
+    const comment = event.target.comment.value.trim();
     if (!comment) return;
 
     try {
@@ -144,63 +141,71 @@ async function addComment(e, id) {
             body: `comment=${encodeURIComponent(comment)}`
         });
 
-        e.target.reset();
+        event.target.reset();
         loadPosts();
 
     } catch (err) {
-        console.error("Comment error:", err);
+        console.error("Error adding comment:", err);
     }
 }
 
 
-/* --------------------------------------
-   SEARCH
--------------------------------------- */
+// --------------------------------------
+// SEARCH
+// --------------------------------------
 async function searchPosts() {
     const query = document.getElementById("searchInput").value.trim();
 
     try {
         const res = await fetch(`/api/resources?search=${encodeURIComponent(query)}`);
-        const data = await res.json();
-
-        renderPosts(data);
-
+        const posts = await res.json();
+        renderPosts(posts);
     } catch (err) {
         console.error("Search error:", err);
     }
 }
 
 
-/* --------------------------------------
-   FILTER + SORT (FIRST CLASS FEATURE)
--------------------------------------- */
-function applyFilters() {
-    const category = document.getElementById("categoryFilter")?.value;
-    const sort = document.getElementById("sortSelect")?.value;
+// --------------------------------------
+// POPULATE CATEGORY FILTER
+// --------------------------------------
+function populateCategories(posts) {
+    const select = document.getElementById("categoryFilter");
+    if (!select) return;
 
-    let filtered = [...allPosts];
+    const categories = new Set();
 
-    // Filter
-    if (category && category !== "all") {
-        filtered = filtered.filter(p => p.category === category);
-    }
+    posts.forEach(p => {
+        if (p.category) categories.add(p.category);
+    });
 
-    // Sort
-    if (sort === "top") {
-        filtered.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
-    } else {
-        filtered.sort((a, b) =>
-            new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
-        );
-    }
+    select.innerHTML = `<option value="all">All Categories</option>`;
 
-    renderPosts(filtered);
+    categories.forEach(cat => {
+        select.innerHTML += `<option value="${cat}">${cat}</option>`;
+    });
 }
 
 
-/* --------------------------------------
-   SECURITY (XSS PROTECTION)
--------------------------------------- */
+// --------------------------------------
+// TOAST NOTIFICATION (MODERN UI)
+// --------------------------------------
+function showToast(message) {
+    let toast = document.createElement("div");
+    toast.textContent = message;
+    toast.className = "toast";
+
+    document.body.appendChild(toast);
+
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+
+// --------------------------------------
+// ESCAPE HTML (SECURITY)
+// --------------------------------------
 function escapeHtml(str) {
     return String(str || "")
         .replace(/&/g, "&amp;")
@@ -210,34 +215,26 @@ function escapeHtml(str) {
 }
 
 
-/* --------------------------------------
-   EVENT LISTENERS
--------------------------------------- */
+// --------------------------------------
+// INIT APP
+// --------------------------------------
 document.addEventListener("DOMContentLoaded", () => {
 
     loadPosts();
 
-    // Create post
-    const form = document.getElementById("postForm");
-    if (form) form.addEventListener("submit", createPost);
+    // Form submit
+    const postForm = document.getElementById("postForm");
+    if (postForm) {
+        postForm.addEventListener("submit", createPost);
+    }
 
     // Search
     const searchBtn = document.getElementById("searchBtn");
-    if (searchBtn) searchBtn.addEventListener("click", searchPosts);
-
-    // Clear search
-    const clearBtn = document.getElementById("clearSearch");
-    if (clearBtn) {
-        clearBtn.addEventListener("click", () => {
-            document.getElementById("searchInput").value = "";
-            loadPosts();
-        });
+    if (searchBtn) {
+        searchBtn.addEventListener("click", searchPosts);
     }
 
-    // Filter + Sort
-    const categoryFilter = document.getElementById("categoryFilter");
-    const sortSelect = document.getElementById("sortSelect");
-
-    if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
-    if (sortSelect) sortSelect.addEventListener("change", applyFilters);
+    // Sort & filter
+    document.getElementById("sortSelect")?.addEventListener("change", loadPosts);
+    document.getElementById("categoryFilter")?.addEventListener("change", loadPosts);
 });
