@@ -7,8 +7,9 @@ app = Flask(__name__)
 app.secret_key = "supersecretkey"
 
 # DATABASE
-client = MongoClient("mongodb://localhost:27017/")
-db = client["skillswap"]
+# ---------------- FAKE DATABASE (IN-MEMORY) ----------------
+users = []
+resources = []
 
 bcrypt = Bcrypt(app)
 
