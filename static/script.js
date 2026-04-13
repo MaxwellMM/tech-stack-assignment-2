@@ -1,67 +1,107 @@
-// --------------------------------------
-// FETCH + LOAD POSTS FROM BACKEND
-// --------------------------------------
+/* --------------------------------------
+   GLOBAL STATE
+-------------------------------------- */
+let allPosts = [];
+
+
+/* --------------------------------------
+   LOAD POSTS FROM FLASK API
+-------------------------------------- */
 async function loadPosts() {
     try {
         const res = await fetch("/api/resources");
-        const posts = await res.json();
-        renderPosts(posts);
+        const data = await res.json();
+
+        allPosts = data;
+        renderPosts(allPosts);
+
     } catch (err) {
         console.error("Error loading posts:", err);
     }
 }
 
-// --------------------------------------
-// RENDER POSTS
-// --------------------------------------
+
+/* --------------------------------------
+   RENDER POSTS
+-------------------------------------- */
 function renderPosts(posts) {
-    const resultsEl = document.getElementById("results");
-    if (!resultsEl) return;
+    const container = document.getElementById("results");
+    if (!container) return;
 
-    resultsEl.innerHTML = posts.map(p => `
-        <div class="card" data-id="${p._id}">
+    if (posts.length === 0) {
+        container.innerHTML = "<p class='muted'>No resources found.</p>";
+        return;
+    }
+
+    container.innerHTML = posts.map(p => `
+        <div class="card tool" data-id="${p._id}">
             <h3>${escapeHtml(p.title)}</h3>
+
+            <p class="muted">
+                ${new Date(p.createdAt || Date.now()).toLocaleString()}
+            </p>
+
             <p>${escapeHtml(p.description)}</p>
-            <p><strong>Category:</strong> ${escapeHtml(p.category || "")}</p>
-            <p><strong>Upvotes:</strong> ${p.upvotes || 0}</p>
 
-            <button onclick="upvote('${p._id}')">⬆ Upvote</button>
+            <div class="tags">
+                <span class="tag">${escapeHtml(p.category || "General")}</span>
+            </div>
 
-            <form onsubmit="addComment(event, '${p._id}')">
-                <input name="comment" placeholder="Add comment" required>
-                <button type="submit">Send</button>
-            </form>
+            <div class="post-actions">
+                <button class="btn alt" onclick="upvote('${p._id}')">
+                    ▲ ${p.upvotes || 0}
+                </button>
+            </div>
 
-            <ul>
-                ${(p.comments || []).map(c => `<li>${escapeHtml(c)}</li>`).join("")}
-            </ul>
+            <div style="margin-top:10px">
+                <strong>Comments:</strong>
+
+                <ul>
+                    ${(p.comments || [])
+                        .map(c => `<li>${escapeHtml(c)}</li>`)
+                        .join("")}
+                </ul>
+
+                <form onsubmit="addComment(event, '${p._id}')">
+                    <input name="comment" placeholder="Write a comment..." required>
+                    <button class="btn">Post</button>
+                </form>
+            </div>
         </div>
     `).join("");
 }
 
-// --------------------------------------
-// CREATE POST
-// --------------------------------------
-async function createPost(event) {
-    event.preventDefault();
 
-    const title = document.getElementById("postTitle").value;
-    const description = document.getElementById("postDesc").value;
-    const category = document.getElementById("postCategory").value;
+/* --------------------------------------
+   CREATE POST
+-------------------------------------- */
+async function createPost(e) {
+    e.preventDefault();
+
+    const title = document.getElementById("postTitle").value.trim();
+    const description = document.getElementById("postDesc").value.trim();
+    const category = document.getElementById("postCategory").value.trim();
 
     if (!title || !description) {
-        alert("Please fill all fields");
+        alert("Please fill all required fields");
         return;
     }
 
     try {
-        await fetch("/add", {
+        const res = await fetch("/add", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded"
             },
             body: `title=${encodeURIComponent(title)}&description=${encodeURIComponent(description)}&category=${encodeURIComponent(category)}`
         });
+
+        const data = await res.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
 
         document.getElementById("postForm").reset();
         loadPosts();
@@ -71,25 +111,27 @@ async function createPost(event) {
     }
 }
 
-// --------------------------------------
-// UPVOTE
-// --------------------------------------
+
+/* --------------------------------------
+   UPVOTE
+-------------------------------------- */
 async function upvote(id) {
     try {
         await fetch(`/upvote/${id}`);
         loadPosts();
     } catch (err) {
-        console.error("Error upvoting:", err);
+        console.error("Upvote error:", err);
     }
 }
 
-// --------------------------------------
-// ADD COMMENT
-// --------------------------------------
-async function addComment(event, id) {
-    event.preventDefault();
 
-    const comment = event.target.comment.value;
+/* --------------------------------------
+   ADD COMMENT
+-------------------------------------- */
+async function addComment(e, id) {
+    e.preventDefault();
+
+    const comment = e.target.comment.value.trim();
 
     if (!comment) return;
 
@@ -102,31 +144,63 @@ async function addComment(event, id) {
             body: `comment=${encodeURIComponent(comment)}`
         });
 
+        e.target.reset();
         loadPosts();
 
     } catch (err) {
-        console.error("Error adding comment:", err);
+        console.error("Comment error:", err);
     }
 }
 
-// --------------------------------------
-// SEARCH
-// --------------------------------------
+
+/* --------------------------------------
+   SEARCH
+-------------------------------------- */
 async function searchPosts() {
-    const query = document.getElementById("searchInput").value;
+    const query = document.getElementById("searchInput").value.trim();
 
     try {
         const res = await fetch(`/api/resources?search=${encodeURIComponent(query)}`);
-        const posts = await res.json();
-        renderPosts(posts);
+        const data = await res.json();
+
+        renderPosts(data);
+
     } catch (err) {
         console.error("Search error:", err);
     }
 }
 
-// --------------------------------------
-// SIMPLE HTML ESCAPE (SECURITY)
-// --------------------------------------
+
+/* --------------------------------------
+   FILTER + SORT (FIRST CLASS FEATURE)
+-------------------------------------- */
+function applyFilters() {
+    const category = document.getElementById("categoryFilter")?.value;
+    const sort = document.getElementById("sortSelect")?.value;
+
+    let filtered = [...allPosts];
+
+    // Filter
+    if (category && category !== "all") {
+        filtered = filtered.filter(p => p.category === category);
+    }
+
+    // Sort
+    if (sort === "top") {
+        filtered.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+    } else {
+        filtered.sort((a, b) =>
+            new Date(b.createdAt || 0) - new Date(a.createdAt || 0)
+        );
+    }
+
+    renderPosts(filtered);
+}
+
+
+/* --------------------------------------
+   SECURITY (XSS PROTECTION)
+-------------------------------------- */
 function escapeHtml(str) {
     return String(str || "")
         .replace(/&/g, "&amp;")
@@ -135,22 +209,35 @@ function escapeHtml(str) {
         .replace(/"/g, "&quot;");
 }
 
-// --------------------------------------
-// INIT APP
-// --------------------------------------
+
+/* --------------------------------------
+   EVENT LISTENERS
+-------------------------------------- */
 document.addEventListener("DOMContentLoaded", () => {
 
     loadPosts();
 
-    // Post form
-    const postForm = document.getElementById("postForm");
-    if (postForm) {
-        postForm.addEventListener("submit", createPost);
+    // Create post
+    const form = document.getElementById("postForm");
+    if (form) form.addEventListener("submit", createPost);
+
+    // Search
+    const searchBtn = document.getElementById("searchBtn");
+    if (searchBtn) searchBtn.addEventListener("click", searchPosts);
+
+    // Clear search
+    const clearBtn = document.getElementById("clearSearch");
+    if (clearBtn) {
+        clearBtn.addEventListener("click", () => {
+            document.getElementById("searchInput").value = "";
+            loadPosts();
+        });
     }
 
-    // Search button
-    const searchBtn = document.getElementById("searchBtn");
-    if (searchBtn) {
-        searchBtn.addEventListener("click", searchPosts);
-    }
+    // Filter + Sort
+    const categoryFilter = document.getElementById("categoryFilter");
+    const sortSelect = document.getElementById("sortSelect");
+
+    if (categoryFilter) categoryFilter.addEventListener("change", applyFilters);
+    if (sortSelect) sortSelect.addEventListener("change", applyFilters);
 });
