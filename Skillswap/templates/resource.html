@@ -12,9 +12,8 @@
   <style>
     body {
       background-image: url("{{ url_for('static', filename='back_ground.png') }}");
-      background-repeat: no-repeat;
-      background-attachment: fixed;
       background-size: cover;
+      background-attachment: fixed;
     }
   </style>
 </head>
@@ -26,7 +25,7 @@
     <div class="logo">SkillSwap Hub</div>
     <nav>
       <a href="/" class="pill">Home</a>
-      <a href="/" class="pill">Resources</a>
+      <a href="/resources" class="pill">Resources</a>
       <a href="/profile" class="pill">Profile</a>
       <a href="/logout" class="pill">Logout</a>
     </nav>
@@ -37,13 +36,15 @@
 
     <div class="card">
       <h2>Community Resources</h2>
-      <p class="muted">Browse, upload, and explore shared community knowledge.</p>
+      <p class="muted">
+        Browse, share, and explore useful learning resources from the community.
+      </p>
 
       <!-- SEARCH -->
       <div class="search-row" style="margin-top:12px">
         <input id="searchInput" type="text" placeholder="Search resources..." />
         <button id="searchBtn" class="btn">Search</button>
-        <button id="clearSearch" class="btn alt">Clear</button>
+        <button onclick="loadPosts()" class="btn alt">Clear</button>
       </div>
 
       <!-- FILTER / SORT -->
@@ -58,35 +59,28 @@
         <select id="sortSelect">
           <option value="new">Newest</option>
           <option value="top">Top Upvoted</option>
-          <a href="/upvote/{{ r._id }}">Upvote</a>
         </select>
-
-        <button id="openPost" class="btn alt" style="margin-left:auto">
-          Share a Resource
-        </button>
 
       </div>
 
-      <!-- POST FORM (USED BY JS) -->
-      <form id="postForm" style="margin-top:15px;">
-        <input id="postTitle" placeholder="Title" required>
-        <input id="postDesc" placeholder="Description" required>
-        <input id="postCategory" placeholder="Category">
-        <button type="submit" class="btn">Add Resource</button>
-      </form>
+      <!-- ADD RESOURCE FORM -->
+      <div class="card" style="margin-top:18px">
+        <h3>Share a Resource</h3>
 
-      <form method="POST" action="/comment/{{ r._id }}">
-        <input name="comment">
-        <button>Send</button>
-      </form>
+        <form id="postForm">
+          <input id="postTitle" placeholder="Title" required>
+          <input id="postDesc" placeholder="Description" required>
+          <input id="postCategory" placeholder="Category (e.g. Coding, Art)">
+          <button type="submit" class="btn" style="margin-top:10px;">
+            Add Resource
+          </button>
+        </form>
+      </div>
 
       <!-- RESULTS -->
       <div id="results" class="tools-list" style="margin-top:18px;"></div>
 
     </div>
-
-    <!-- MODAL ROOT -->
-    <div id="modalRoot" class="hidden"></div>
 
   </main>
 
