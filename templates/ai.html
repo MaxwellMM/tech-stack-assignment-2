@@ -5,66 +5,123 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>AI Tools — SkillSwap Hub</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-  <script defer src="script.js"></script>
-</head>
 
-<style>
-  body {
-    background-image: url('back_ground.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
-  }
-</style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='back_ground.png') }}");
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+
+    .tool-card {
+      padding: 15px;
+      border: 1px solid #eee;
+      border-radius: 10px;
+      margin-top: 10px;
+      background: #fff;
+    }
+
+    .tool-card h4 {
+      margin: 0;
+      color: var(--accent);
+    }
+
+    .tool-card p {
+      margin: 5px 0 0;
+      font-size: 14px;
+    }
+  </style>
+</head>
 
 <body>
 
-  <!-- Login protection -->
-  <script>
-    if (!localStorage.getItem('skillhub_currentUser')) {
-      window.location.href = 'login.html';
-    }
-  </script>
-
+  <!-- HEADER -->
   <header>
     <div class="logo">SkillSwap Hub</div>
 
     <nav>
-      <a href="index.html" class="pill">Home</a>
-      <a href="resource.html" class="pill">Resources</a>
-      <a href="ai.html" class="pill">AI Tools</a>
-      <a href="about.html" class="pill">About</a>
-      <a href="contact.html" class="pill">Contact</a>
-      <button id="logoutBtn" class="btn alt">Logout</button>
+      <a href="/" class="pill">Home</a>
+      <a href="/resources" class="pill">Resources</a>
+      <a href="/profile" class="pill">Profile</a>
+      <a href="/contact" class="pill">Contact</a>
+      <a href="/logout" class="pill">Logout</a>
     </nav>
   </header>
 
+  <!-- MAIN -->
   <main style="max-width:900px;margin:auto;padding:20px">
+
     <div class="card">
       <h2>AI Tools for Learning & Creativity</h2>
+
       <p class="muted">
-        These AI tools help with writing, coding, image generation, 3D creation, and more.
-        All information is stored locally using <strong>localStorage</strong>.
+        Artificial Intelligence (AI) tools are increasingly used to enhance productivity,
+        creativity, and learning. This section highlights popular tools that can assist
+        users in developing skills, generating ideas, and improving workflows.
       </p>
 
-      <h3 style="margin-top:20px">Available AI Tools</h3>
+      <h3 style="margin-top:20px">Featured AI Tools</h3>
 
-      <h4>Luma Labs - 3D Model generation</h4>
-      <h4>Chatgpt - Writing, Brainstorming</h4>
-      <h4>Copilot - Summarisation</h4>
-      <h4>Figma - Design ideas</h4>
+      <div class="tool-card">
+        <h4>ChatGPT</h4>
+        <p>
+          An advanced conversational AI used for writing, brainstorming, coding help,
+          and explanations. Useful for students and developers.
+        </p>
+      </div>
 
-      
+      <div class="tool-card">
+        <h4>GitHub Copilot</h4>
+        <p>
+          AI-powered coding assistant that suggests code in real-time, improving
+          developer efficiency and reducing errors.
+        </p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Stable Diffusion</h4>
+        <p>
+          A powerful image generation model used for creating digital artwork,
+          design concepts, and visual assets.
+        </p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Luma AI</h4>
+        <p>
+          Enables 3D model generation and immersive visual creation using AI,
+          particularly useful in design and virtual environments.
+        </p>
+      </div>
+
+      <div class="tool-card">
+        <h4>Figma AI</h4>
+        <p>
+          Assists with UI/UX design by generating layouts, components, and design
+          suggestions, speeding up the prototyping process.
+        </p>
+      </div>
+
+      <h3 style="margin-top:25px">Relevance to SkillSwap Hub</h3>
+      <p>
+        These tools support the platform’s goal of enabling users to learn and
+        share skills efficiently. By integrating AI-assisted learning resources,
+        SkillSwap Hub enhances user experience and promotes innovation within
+        the community.
+      </p>
+
     </div>
+
   </main>
 
+  <!-- FOOTER -->
   <footer>
-    SkillSwap Hub — Prototype for COM4113
+    SkillSwap Hub — COM4113 Full-Stack Project
   </footer>
-
-  <!-- Modal Root -->
-  <div id="modalRoot" class="hidden"></div>
 
 </body>
 
