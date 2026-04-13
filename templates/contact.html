@@ -5,68 +5,86 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Contact — SkillSwap Hub</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
 
-<style>
-    body {
-        background-image: url('back_ground.png');
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-size: cover;
-    }
-</style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='back_ground.png') }}");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+</head>
 
 <body>
 
-    <!-- LOGIN PROTECTION -->
-    <script>
-        if (!localStorage.getItem('skillhub_currentUser')) {
-            window.location.href = "login.html";
-        }
-    </script>
-
+    <!-- HEADER -->
     <header>
         <div class="logo">SkillSwap Hub</div>
 
         <nav>
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="about.html" class="nav-link">About</a>
-            <a href="resource.html" class="nav-link">Resources</a>
-            <a href="ai.html" class="nav-link">AI Tools</a>
-            <a href="login.html" class="nav-link">Logout</a>
+            <a href="/" class="pill">Home</a>
+            <a href="/resources" class="pill">Resources</a>
+            <a href="/ai" class="pill">AI Tools</a>
+            <a href="/profile" class="pill">Profile</a>
+            <a href="/logout" class="pill">Logout</a>
         </nav>
     </header>
 
+    <!-- MAIN -->
     <main style="max-width:900px;margin:auto;padding:20px">
+
         <div class="card">
             <h2>Contact Us</h2>
-            <p class="muted">Have a question? Send us a message below.</p>
 
-            <form id="contactForm" style="margin-top:15px">
-                <label>Full Name *<br>
-                    <input type="text" id="contactName" required>
+            <p class="muted">
+                If you have any questions, feedback, or suggestions regarding SkillSwap Hub,
+                please use the form below. This feature demonstrates form handling within
+                a full-stack web application.
+            </p>
+
+            <!-- CONTACT FORM -->
+            <form method="POST" action="/contact" style="margin-top:15px">
+
+                <label>
+                    Full Name *<br>
+                    <input type="text" name="name" required>
                 </label>
 
-                <label style="margin-top:10px">Email *<br>
-                    <input type="email" id="contactEmail" required>
+                <label style="margin-top:10px">
+                    Email *<br>
+                    <input type="email" name="email" required>
                 </label>
 
-                <label style="margin-top:10px">Message *<br>
-                    <textarea id="contactMessage" required></textarea>
+                <label style="margin-top:10px">
+                    Message *<br>
+                    <textarea name="message" required></textarea>
                 </label>
 
-                <button class="btn" type="submit" style="margin-top:12px">Send</button>
-                <div id="contactFeedback" class="muted" style="margin-top:10px"></div>
+                <button class="btn" type="submit" style="margin-top:12px">
+                    Send Message
+                </button>
+
             </form>
+
+            <!-- FEEDBACK MESSAGE -->
+            {% if message %}
+                <div class="muted" style="margin-top:12px">
+                    {{ message }}
+                </div>
+            {% endif %}
+
         </div>
+
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        COM4113 — SkillSwap Hub Project
+        SkillSwap Hub — COM4113 Full-Stack Project
     </footer>
-
-    <script src="script.js"></script>
 
 </body>
 
