@@ -176,3 +176,24 @@ def comment(id):
 # ---------------- RUN ----------------
 if __name__ == "__main__":
     app.run(debug=True)
+
+@app.route("/contact", methods=["GET", "POST"])
+def contact():
+    if "user" not in session:
+        return redirect("/login")
+
+    if request.method == "POST":
+        name = request.form.get("name")
+        email = request.form.get("email")
+        message = request.form.get("message")
+
+        # Save to database (optional but good for marks)
+        db.messages.insert_one({
+            "name": name,
+            "email": email,
+            "message": message
+        })
+
+        return render_template("contact.html", message="Message sent successfully!")
+
+    return render_template("contact.html")
