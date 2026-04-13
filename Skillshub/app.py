@@ -81,7 +81,8 @@ def login():
         if user and bcrypt.check_password_hash(user["password"], password):
             session["user"] = email
             return redirect("/")
-        return "Invalid login"
+        else:
+            return render_template("login.html", error="Invalid email or password")
 
     return render_template("login.html")
 
