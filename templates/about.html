@@ -5,84 +5,93 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>About — SkillSwap Hub</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
 
-<style>
-    body {
-        background-image: url('back_ground.png');
-        background-repeat: no-repeat;
-        background-attachment: fixed;
-        background-size: cover;
-    }
-</style>
+    <!-- CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+    <style>
+        body {
+            background-image: url("{{ url_for('static', filename='back_ground.png') }}");
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-size: cover;
+        }
+    </style>
+</head>
 
 <body>
 
-    <!-- LOGIN PROTECTION -->
-    <script>
-        if (!localStorage.getItem('skillhub_currentUser')) {
-            window.location.href = "login.html";
-        }
-    </script>
-
+    <!-- HEADER -->
     <header>
         <div class="logo">SkillSwap Hub</div>
 
         <nav>
-            <a href="index.html" class="nav-link">Home</a>
-            <a href="resource.html" class="nav-link">Resources</a>
-            <a href="contact.html" class="nav-link">Contact</a>
-            <a href="ai.html" class="nav-link">AI Tools</a>
-            <a href="login.html" class="nav-link">Logout</a>
+            <a href="/" class="pill">Home</a>
+            <a href="/resources" class="pill">Resources</a>
+            <a href="/ai" class="pill">AI Tools</a>
+            <a href="/contact" class="pill">Contact</a>
+            <a href="/profile" class="pill">Profile</a>
+            <a href="/logout" class="pill">Logout</a>
         </nav>
     </header>
 
+    <!-- MAIN CONTENT -->
     <main style="max-width:900px;margin:auto;padding:20px">
+
         <div class="card">
             <h2>About SkillSwap Hub</h2>
 
             <p>
-                SkillSwap Hub is a community driven platform where learners,
-                hobbyists, and creators can exchange skills, share learning
-                resources, and support each other's growth.
+                SkillSwap Hub is a full-stack web application designed to support
+                collaborative learning through a community-driven platform.
+                Users can share knowledge, discover new skills, and engage with
+                others through interactive features such as posting resources,
+                commenting, and upvoting.
             </p>
 
             <h3>Our Mission</h3>
             <p>
-                To empower individuals of all backgrounds to learn, teach, and grow
-                through a collaborative skills sharing community. Learning will be
-                accessible, supportive, and fun and SkillSwap Hub will make that possible.
+                The mission of SkillSwap Hub is to make learning accessible,
+                inclusive, and engaging for individuals from all backgrounds.
+                By combining modern web technologies with community interaction,
+                the platform encourages knowledge exchange and skill development.
             </p>
 
-            <h3>What You Can Do</h3>
+            <h3>Key Features</h3>
             <ul>
-                <li>Share your own learning resources</li>
-                <li>Browse community posts by category</li>
-                <li>Search, filter, and sort resources</li>
-                <li>Upload images with your posts</li>
-                <li>Comment on posts and join discussions</li>
-                <li>Create and update your personal profile</li>
-                <li>Request new skills from the community</li>
+                <li>User authentication system (login & registration)</li>
+                <li>Profile creation and personalisation</li>
+                <li>Resource sharing with categories</li>
+                <li>Search and filtering functionality</li>
+                <li>Upvoting and commenting system</li>
+                <li>REST API integration with Flask backend</li>
             </ul>
 
-            <h3>Technology Used</h3>
+            <h3>Technologies Used</h3>
             <ul>
-                <li>HTML5, CSS3, JavaScript</li>
-                <li>LocalStorage for saving posts, profiles, and comments</li>
-                <li>Client-side dynamic rendering (no server needed)</li>
-                <li>Responsive layout for mobiles, tablets, and desktops</li>
+                <li><strong>Frontend:</strong> HTML5, CSS3, JavaScript</li>
+                <li><strong>Backend:</strong> Flask (Python)</li>
+                <li><strong>Database:</strong> MongoDB</li>
+                <li><strong>Security:</strong> Flask-Bcrypt for password hashing</li>
+                <li><strong>Architecture:</strong> Client-server model with REST API</li>
             </ul>
-            
+
+            <h3>Academic Context</h3>
+            <p>
+                This project was developed as part of the COM4113 module and
+                demonstrates full-stack development skills. It includes both
+                frontend interface design and backend implementation, with a
+                focus on usability, responsiveness, and secure data handling.
             </p>
+
         </div>
+
     </main>
 
+    <!-- FOOTER -->
     <footer>
-        COM4113 — SkillSwap Hub
+        SkillSwap Hub — COM4113 Full-Stack Project
     </footer>
-
-    <script src="script.js"></script>
 
 </body>
 
