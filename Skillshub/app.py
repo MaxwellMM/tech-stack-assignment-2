@@ -122,13 +122,19 @@ def profile():
         return redirect("/login")
 
     if request.method == "POST":
+        name = request.form.get("name")
+        bio = request.form.get("bio")
+
         db.users.update_one(
             {"email": session["user"]},
             {"$set": {
-                "name": request.form.get("name"),
-                "bio": request.form.get("bio")
+                "name": name,
+                "bio": bio
             }}
         )
+
+        user = db.users.find_one({"email": session["user"]})
+        return render_template("profile.html", user=user, message="Profile updated successfully!")
 
     user = db.users.find_one({"email": session["user"]})
     return render_template("profile.html", user=user)
