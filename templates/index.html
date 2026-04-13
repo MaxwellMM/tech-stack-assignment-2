@@ -4,187 +4,120 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Community Skill Swap Hub</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-</head>
+  <title>Home — SkillSwap Hub</title>
 
-<style>
-  body {
-    background-image: url('back_ground.png');
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    background-size: cover;
-  }
-</style>
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+  <style>
+    body {
+      background-image: url("{{ url_for('static', filename='back_ground.png') }}");
+      background-repeat: no-repeat;
+      background-attachment: fixed;
+      background-size: cover;
+    }
+  </style>
+</head>
 
 <body>
 
-  <!-- LOGIN PROTECTION -->
-  <script>
-    if (!localStorage.getItem('skillhub_currentUser')) {
-      window.location.href = "login.html";
-    }
-  </script>
-
+  <!-- HEADER -->
   <header>
     <div class="logo">SkillSwap Hub</div>
-    <div class="muted">Front End</div>
 
     <nav>
-      <select id="categoryFilter">
-        <option value="all">All categories</option>
-      </select>
-
-      <a href="about.html" class="nav-link">About</a>
-      <a href="contact.html" class="nav-link">Contact</a>
-      <a href="resource.html" class="nav-link">Resources</a>
-      <a href="ai.html" class="nav-link">AI Tools</a>
+      <a href="/" class="pill">Home</a>
+      <a href="/resources" class="pill">Resources</a>
+      <a href="/ai" class="pill">AI Tools</a>
+      <a href="/contact" class="pill">Contact</a>
+      <a href="/profile" class="pill">Profile</a>
+      <a href="/logout" class="pill">Logout</a>
     </nav>
   </header>
 
+  <!-- MAIN -->
   <main>
+
     <div class="grid">
 
-      <!-- LEFT SIDE -->
+      <!-- LEFT -->
       <section>
 
         <div class="card">
           <h2>Explore Resources</h2>
 
+          <!-- SEARCH -->
           <div class="search-row" style="margin-top:12px">
-            <input id="searchInput" type="text" placeholder="Search resources, e.g., '3D printing'" />
+            <input id="searchInput" type="text" placeholder="Search resources..." />
             <button id="searchBtn" class="btn">Search</button>
-
-            <script>
-              document.getElementById("searchBtn").addEventListener("click", () => {
-                window.location.href = "resource.html";
-              });
-            </script>
-
             <button id="clearSearch" class="btn alt">Clear</button>
           </div>
 
-          <div class="card" style="margin-top:20px">
-            <h3>Request a Skill</h3>
-            <input id="skillRequest" placeholder="e.g. Advanced Python" />
-            <button id="requestBtn" class="btn alt">Request</button>
-            <div id="requestFeedback" class="muted"></div>
-          </div>
-
-          <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+          <!-- SORT -->
+          <div style="margin-top:12px;display:flex;gap:10px;align-items:center">
             <label class="muted">Sort:</label>
             <select id="sortSelect">
               <option value="new">Newest</option>
               <option value="top">Top Upvoted</option>
             </select>
-
-             <button id="resourceBtn" class="btn">Share a Resource</button>
-
-            <script>
-              document.getElementById("resourceBtn").addEventListener("click", () => {
-                window.location.href = "resource.html";
-              });
-            </script>
           </div>
 
-          <div id="results" style="margin-top:14px" class="tools-list"></div>
+          <!-- RESULTS -->
+          <div id="results" class="tools-list" style="margin-top:14px"></div>
         </div>
 
-        <div id="about" class="card" style="margin-top:18px">
-          <h3>About Us</h3>
-          <p>This is the front end interface for the Community Skill Swap Hub.</p>
-        </div>
-
-        <div id="contact" class="card" style="margin-top:18px">
-          <h3>Contact Us</h3>
-          <form id="contactForm">
-            <label>Full Name *<br><input type="text" required></label>
-            <label>Email *<br><input type="email" required></label>
-            <label>Message *<br><textarea required></textarea></label>
-
-            <button class="btn" type="submit">Send</button>
-            <div id="contactFeedback" class="muted"></div>
-          </form>
+        <!-- ABOUT PREVIEW -->
+        <div class="card" style="margin-top:18px">
+          <h3>About SkillSwap Hub</h3>
+          <p>
+            A full-stack web platform that enables users to share and discover
+            learning resources. Built using Flask, MongoDB, and JavaScript.
+          </p>
         </div>
 
       </section>
 
-      <!-- RIGHT SIDE -->
+      <!-- RIGHT -->
       <aside>
 
+        <!-- USER INFO -->
         <div class="card">
-          <h4>Your Profile</h4>
+          <h4>Your Account</h4>
+          <p class="muted">
+            Logged in as: <strong>{{ session['user'] }}</strong>
+          </p>
 
-          <div id="userProfile" style="display:none">
-            <img id="userPhoto" style="max-width:100px;border-radius:50%;margin-bottom:10px" />
-
-            <h3 id="userName"></h3>
-            <p id="userEmail" class="muted"></p>
-
-            <p><strong>Skills:</strong></p>
-            <ul id="userSkills"></ul>
-          </div>
-
-          <button id="editProfile" class="btn alt">Edit Profile</button>
-          <button id="logoutBtn" class="btn" style="margin-top:10px">Logout</button>
+          <a href="/profile" class="btn alt" style="margin-top:10px;display:block;">
+            Edit Profile
+          </a>
         </div>
 
+        <!-- QUICK ACTION -->
         <div class="card">
-          <h4>Categories</h4>
-          <p>Coding • Baking • Art • AI • Music • Gardening • 3D Printing</p>
-        </div>
+          <h4>Quick Actions</h4>
 
-        <div class="card">
-          <h4>AI Tools</h4>
-          <ul id="aiList"></ul>
+          <form method="POST" action="/add" style="margin-top:10px">
+            <input name="title" placeholder="Title" required>
+            <input name="description" placeholder="Description" required>
+            <input name="category" placeholder="Category">
+
+            <button class="btn" style="margin-top:10px">Add Resource</button>
+          </form>
         </div>
 
       </aside>
+
     </div>
+
   </main>
 
+  <!-- FOOTER -->
   <footer>
-    COM4113 — Frontend Website
+    SkillSwap Hub — COM4113 Full-Stack Project
   </footer>
 
-  <!-- PROFILE + LOGOUT LOGIC -->
-  <script>
-    const currentUser = JSON.parse(localStorage.getItem('skillhub_currentUser'));
-
-    const profileBox = document.getElementById('userProfile');
-    const nameEl = document.getElementById('userName');
-    const emailEl = document.getElementById('userEmail');
-    const skillsEl = document.getElementById('userSkills');
-    const photoEl = document.getElementById('userPhoto');
-    const editBtn = document.getElementById('editProfile');
-    const logoutBtn = document.getElementById('logoutBtn');
-
-    if (currentUser) {
-      profileBox.style.display = 'block';
-      nameEl.textContent = currentUser.fullName;
-      emailEl.textContent = currentUser.email;
-
-      skillsEl.innerHTML = '';
-      (currentUser.skills || []).forEach(skill => {
-        const li = document.createElement('li');
-        li.textContent = skill;
-        skillsEl.appendChild(li);
-      });
-
-      if (currentUser.photo) {
-        photoEl.src = currentUser.photo;
-      }
-    }
-
-    editBtn.addEventListener('click', () => {
-      window.location.href = 'profile.html';
-    });
-
-    logoutBtn.addEventListener('click', () => {
-      localStorage.removeItem('skillhub_currentUser');
-      window.location.href = 'login.html';
-    });
-  </script>
+  <!-- JS -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 
