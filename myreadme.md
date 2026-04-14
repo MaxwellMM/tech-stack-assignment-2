@@ -166,6 +166,43 @@ Prevention of duplicate users
 
 Basic session protection
 
+## Challenges Faced
+
+During the development of the SkillSwap Hub application, several technical and design challenges were encountered. These challenges contributed to a deeper understanding of full stack development and problem solving within a real-world context.
+
+- Backend Integration and Routing
+
+One of the primary challenges was integrating the frontend with the Flask backend. Initially, issues arose with incorrect routing and template rendering, particularly the *TemplateNotFound* error. This was resolved by restructuring the project directory to ensure all HTML files were correctly placed within the *templates* folder, as required by Flask’s rendering engine.
+
+- Database Connectivity (MongoDB)
+
+An attempt was made to integrate MongoDB for persistent data storage. However, significant issues were encountered, including connection errors (*ServerSelectionTimeoutError*) due to MongoDB not running locally or not being configured in the system PATH. While this demonstrated the complexity of database integration, the project was adapted to use in memory data structures instead. This ensured functionality while maintaining development progress within time constraints.
+
+- State Management and Data Persistence
+
+Without a database, maintaining application state became a challenge. Data such as users and resources are stored temporarily in Python lists, meaning all data is lost when the server restarts. This limitation required careful handling of session data and user interactions to ensure a smooth user experience despite the lack of persistence.
+
+- Frontend–Backend Synchronisation
+
+Ensuring seamless communication between JavaScript (frontend) and Flask (backend) required careful debugging. Issues such as incorrect API endpoints, inconsistent data formats, and page reload behaviour were resolved by standardising routes and implementing fetch based API calls.
+
+- Debugging Template Errors
+
+Errors such as *‘r is undefined’* in Jinja templates highlighted the importance of correctly passing variables from Flask to HTML. This was resolved by ensuring all dynamic content was rendered within proper loops and that data was consistently structured.
+
+- UI/UX Design Improvements
+
+Another challenge was transforming the interface from a basic layout into a modern, user-friendly design. This required refining CSS styling, improving layout responsiveness, and ensuring consistent navigation across all pages. Achieving a professional appearance required iterative design improvements and testing across different screen sizes.
+
+- Project Structure and File Organisation
+
+Initially, incorrect file placement caused multiple runtime issues. Ensuring a correct structure (e.g., separating *templates*, *static*, and backend files) was essential for the application to function properly. This reinforced best practices in web development project organisation.
+
+---
+
+- Reflection
+
+These challenges significantly improved technical skills in debugging, backend integration, and system design. Overcoming them resulted in a more robust and functional application, demonstrating both practical implementation skills
 
 
 ## Testing and Debugging
