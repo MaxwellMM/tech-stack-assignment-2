@@ -1,0 +1,2 @@
+Flask ( web framework)
+flask-bcrypt ( Password hashing)
