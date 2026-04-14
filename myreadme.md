@@ -2,14 +2,15 @@
 ## SkillSwap Hub – Project Report
 
 ## Introduction
-The purpose of this project is to design and develop a full-stack web application called SkillSwap Hub, which enables users to share skills, upload resources, and collaborate within a community-driven platform. The system allows users to register, log in, create profiles, post resources, and interact through comments and upvotes.
+The purpose of this project is to design and develop a full stack web application called SkillSwap Hub, which enables users to share skills, upload resources, and collaborate within a community driven platform. The system allows users to register, log in, create profiles, post resources, and interact through comments and upvotes.
 This project demonstrates the integration of frontend and backend technologies, including HTML, CSS, JavaScript, and Python Flask. It also focuses on usability, responsiveness, and secure user authentication.
 
 ## Aims and Objectives
 Aim
-To develop a functional and modern web application that supports community-based skill sharing.
+To develop a functional and modern web application that supports community based skill sharing.
+
 Objectives
-Design a responsive and user-friendly interface
+Design a responsive and user friendly interface
 
 
 Implement user authentication (login/register/logout)
@@ -65,7 +66,7 @@ In the terminal "cd Skillswap"
 
 ## System Design
 4.1 Architecture
-The application follows a client-server architecture:
+The application follows a client server architecture:
 Frontend handles user interaction
 
 

@@ -5,9 +5,9 @@ app.secret_key = "supersecretkey"
 
 
 # --------------------------------------
-# FAKE DATABASE (IN-MEMORY)
+# DATABASE (IN-MEMORY)
 # --------------------------------------
-# This replaces MongoDB for now (Option 2)
+
 
 users = []
 resources = []
