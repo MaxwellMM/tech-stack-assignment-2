@@ -57,6 +57,11 @@ Libraries
 Flask-Bcrypt – Password hashing for secure authentication
 
 
+## Go into correct folder
+
+To go into the correct folder
+In the terminal "cd Skillswap"
+
 
 ## System Design
 4.1 Architecture
@@ -70,9 +75,40 @@ Backend processes requests and manages data
 API endpoints connect frontend and backend
 
 
-4.2 Gantt Chart
+## Gantt Chart
 The project was developed over six weeks using a structured timeline with dependencies between tasks. Early phases focused on planning and design, followed by frontend and backend implementation, and finally testing and refinement.
-4.3 UI Design
+
+## User guide 
+
+The SkillSwap Hub system is designed to be simple and intuitive. The following steps outline how a user interacts with the platform:
+
+Registration  
+Users begin by creating an account using their email and password on the registration page.
+
+Login  
+Once registered, users log in securely using their credentials. Successful login redirects the user to the homepage.
+
+Viewing Resources  
+The homepage displays community resources. Users can browse, search, and filter content based on categories.
+
+Adding a Resource  
+Users can submit a new resource by entering a title, description, and category. The resource is then stored and displayed to other users.
+
+Interacting with Content  
+Users can:
+- Upvote resources to show appreciation  
+- Add comments to engage in discussion  
+
+Profile Management  
+Users can edit their profile, including name, skills, and profile image.
+
+Logout  
+Users can securely log out, ending their session.
+
+This workflow ensures a user friendly experience and encourages interaction within the community
+
+
+##  UI Design
 The interface was designed with:
 Card-based layout
 
@@ -169,7 +205,7 @@ Intuitive navigation
 Fast interaction using JavaScript
 
 
-Improvements:
+## Improvements:
 Add dark mode
 
 
